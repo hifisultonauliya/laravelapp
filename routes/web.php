@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// new route...
+use App\Http\Controllers\ExcelController;
+Route::get('/api/excel-data', [ExcelController::class, 'getData']);
