@@ -8,6 +8,7 @@ Laravel App was build using laravel 8 and vuejs 2. this just example implementat
 
 -   need to install composer in youre machine
 -   need to install nodejs in youre machine
+-   need to install docker in youre machine
 
 ## How to Install
 
