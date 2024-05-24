@@ -19,4 +19,5 @@ Route::get('/', function () {
 
 // new route...
 use App\Http\Controllers\ExcelController;
-Route::get('/api/excel-data', [ExcelController::class, 'getData']);
+Route::get('/api/masterproduct', [ExcelController::class, 'getMasterProduct']);
+Route::get('/api/products', [ExcelController::class, 'getAllDatas']);

@@ -11,8 +11,8 @@
 </head>
 <body>
     <div id="app">
-        <main-menu></main-menu>
-        <excel-data-component></excel-data-component>
+        <header-component></header-component>
+        <filter-component></filter-component>
     </div>
 
     <script src="{{ mix('js/app.js') }}"></script>

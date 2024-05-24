@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Collection;
+use App\Models\Product;
 
 class ExcelController extends Controller
 {
-    public function getData()
+    public function getMasterProduct()
     {
         try {
             $path = storage_path('app/public/sampledatas.xlsx'); // Path to your existing Excel file
@@ -18,67 +19,91 @@ class ExcelController extends Controller
             // Convert the collection to a regular PHP array
             $data = $data->toArray();
 
-            $fieldNames = $data[0]; // Assuming the first row contains field names
+            // $fieldNames = $data[0]; // Assuming the first row contains field names
 
             // Remove the first row (field names)
             array_shift($data);
 
             // Convert data rows into an array of objects
-            $objects = [];
+            $products = [];
             foreach ($data as $row) {
-                $object = new \stdClass(); // Create an empty object
+                // mapping into product
+                $product = new Product();
+                $product->setId($row[0]);
+                $product->setCode($row[1]);
+                $product->setItemId($row[2]);
+                $product->setQty($row[3]);
+                $product->setQtyUnit($row[4]);
+                $product->setCountryName($row[5]);
+                $product->setItemCode($row[6]);
+                $product->setItemDesc($row[7]);
+                $product->setProductType($row[8]);
+                $product->setGrade($row[9]);
+                $product->setConnection($row[10]);
+                $product->setSize($row[11]);
 
-                foreach ($fieldNames as $index => $fieldName) {
-                    if(is_null($fieldName)){
-                        continue;
-                    }elseif($fieldName == "qty"){
-                        $object->{$fieldName} = (int)$row[$index];
-                        $object->{$fieldName."Original"} = $row[$index];
-                    }elseif($fieldName == "size"){
-                        $object->{$fieldName} = $this->calculateMixedNumber($row[$index]);
-                        $object->{$fieldName."Str"} = $this->getSizeDesc($object->{$fieldName});
-                        $object->{$fieldName."Original"} = $row[$index];
-                    }else{
-                        $object->{$fieldName} = $row[$index];
-                    }
-                    
-                }
-
-                $objects[] = $object;
+                $products[] = $product->getMastersData();
             }
-            return response()->json($objects);
+            return response()->json($products);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    private function getSizeDesc($input){
-        return $input."\" (".$this->convertInchToMilimeter($input)."mm)";
-    }
+    public function getAllDatas(Request $request)
+    {
+        try {
+            $path = storage_path('app/public/sampledatas.xlsx'); // Path to your existing Excel file
+            $data = Excel::toCollection(null, $path)->first(); // Load data into a collection
 
-    private function convertInchToMilimeter($input){
-        return $input * 24.5;
-    }
+            // Convert the collection to a regular PHP array
+            $data = $data->toArray();
 
-    private function calculateMixedNumber($input) {
-        // Remove spaces and split into parts
-        $parts = explode(" ", $input);
-    
-        // Initialize the result
-        $result = 0.0;
-    
-        // Convert and multiply each part
-        foreach ($parts as $part) {
-            if (strpos($part, '/') !== false) {
-                // Handle fractions (e.g., "1/2")
-                list($numerator, $denominator) = explode('/', $part);
-                $result += (float)$numerator / (float)$denominator;
-            } else {
-                // Handle whole numbers (e.g., "5")
-                $result += (float)$part;
+            // Remove the first row (field names)
+            array_shift($data);
+
+            // Convert data rows into an array of objects
+            $products = [];
+            foreach ($data as $row) {
+                $product = new Product();
+                $product->setId($row[0]);
+                $product->setCode($row[1]);
+                $product->setItemId($row[2]);
+                $product->setQty($row[3]);
+                $product->setQtyUnit($row[4]);
+                $product->setCountryName($row[5]);
+                $product->setItemCode($row[6]);
+                $product->setItemDesc($row[7]);
+                $product->setProductType($row[8]);
+                $product->setGrade($row[9]);
+                $product->setConnection($row[10]);
+                $product->setSize($row[11]);
+
+                $products[] = $product;
             }
+
+            // Get filter parameters from the request
+            $productType = $request->query('productType');
+            $size = $request->query('size');
+            $grade = $request->query('grade');
+            $connection = $request->query('connection');
+
+            // Filter products based on the query parameters
+            $filteredProducts = array_filter($products, function ($product) use ($productType, $size, $grade, $connection) {
+                return response()->json((!$productType || $product->getAllData()['productType'] === $productType) &&
+                       (!$size || $product->getAllData()['sizeDesc'] === $size) &&
+                       (!$grade || $product->getAllData()['grade'] === $grade) &&
+                       (!$connection || $product->getAllData()['connection'] === $connection));
+            });
+
+            // Transform the filtered products to get the required data
+            $filteredProductsData = array_map(function ($product) {
+                return $product->getAllData();
+            }, $filteredProducts);
+
+            return response()->json($filteredProductsData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-    
-        return $result;
     }
 }

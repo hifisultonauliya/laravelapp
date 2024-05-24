@@ -1,26 +1,9 @@
 <template>
     <div>
         <b-container fluid="lg">
-            <b-row class="filters">
-                <b-col cols="3">
-                    <v-select :options="['Canada', 'United States']"></v-select>
-                </b-col>
-                <b-col cols="3">
-                    <v-select :options="['Canada', 'United States']"></v-select>
-                </b-col>
-                <b-col cols="3">
-                    <v-select :options="['Canada', 'United States']"></v-select>
-                </b-col>
-                <b-col cols="3">
-                    <v-select :options="['Canada', 'United States']"></v-select>
-                </b-col>
-            </b-row>
-            <b-row class="btn-filter">
-                <b-button variant="dark">Find</b-button>
-            </b-row>
+            
             <h1>Excel Data</h1>
-            {{ data }}
-            <!-- <table v-if="data.length">
+            <table v-if="data.length">
                 <thead>
                     <tr>
                         <th v-for="(header, index) in data[0]" :key="index">{{ header }}</th>
@@ -31,13 +14,12 @@
                         <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}</td>
                     </tr>
                 </tbody>
-            </table> -->
+            </table>
         </b-container>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
 
 export default {
     data() {
@@ -46,19 +28,19 @@ export default {
         };
     },
     mounted() {
-        this.fetchData();
+        // this.fetchData();
     },
     methods: {
-        fetchData() {
-            axios.get('/api/excel-data')
-                .then(response => {
-                    console.log("response", response)
-                    this.data = response.data;
-                })
-                .catch(error => {
-                    console.error('There was an error fetching the data!', error);
-                });
-        }
+        // fetchData() {
+        //     axios.get('/api/masterproduct')
+        //         .then(response => {
+        //             console.log("response", response)
+        //             this.data = response.data;
+        //         })
+        //         .catch(error => {
+        //             console.error('There was an error fetching the data!', error);
+        //         });
+        // }
     }
 };
 </script>
